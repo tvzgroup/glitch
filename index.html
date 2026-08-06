@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLITCH — Ekosystem Discord</title>
+    <style>
+        :root {
+            --bg-dark: #07050e;
+            --accent-purple: #8a2be2;
+            --accent-cyan: #00f2fe;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-hover: rgba(255, 255, 255, 0.06);
+            --text-main: #f0f2f5;
+            --text-muted: #a0a5b5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+        }
+
+        /* Tło z efektami glow */
+        .bg-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-1 { top: -100px; left: -100px; background: var(--accent-purple); }
+        .glow-2 { bottom: -100px; right: -100px; background: var(--accent-cyan); }
+
+        /* Nawigacja */
+        nav {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px auto 0;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 14px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple), #4752c4);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 16px rgba(138, 43, 226, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.5);
+        }
+
+        /* Sekcja główna */
+        main {
+            position: relative;
+            z-index: 1;
+            padding: 80px 20px;
+            text-align: center;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 18px;
+        }
+
+        h1 span {
+            background: linear-gradient(90deg, #ffffff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        /* Karty funkcji */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 14px;
+            transition: background 0.2s ease;
+        }
+
+        .card:hover {
+            background: var(--glass-hover);
+        }
+
+        .card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .card p {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+            line-height: 1.4;
+        }
+
+        /* Stopka */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 24px 20px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.1rem; }
+            main { padding: 40px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <nav>
+        <div class="logo">GLITCH</div>
+        <a href="https://discord.com" class="btn-primary">Panel / Discord</a>
+    </nav>
+
+    <main>
+        <span class="hero-tag">Zarządzanie & Automatyzacja</span>
+        <h1>Zaawansowane wsparcie dla <span>Twojego Serwera</span></h1>
+        <p>System weryfikacji, dynamiczne pokoje głosowe oraz obsługa zgłoszeń w jednym lekkim ekosystemie.</p>
+        
+        <a href="https://discord.com" class="btn-primary" style="padding: 12px 28px; font-size: 1rem;">Dodaj do Discorda</a>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Zgłoszenia</h3>
+                <p>Wielopoziomowe panele ticketów z historią rozmów.</p>
+            </div>
+            <div class="card">
+                <h3>Pokoje Audio</h3>
+                <p>Automatyczne tworzenie kanałów na życzenie.</p>
+            </div>
+            <div class="card">
+                <h3>Weryfikacja</h3>
+                <p>Ochrona przed botami i rajdami użytkowników.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 GLITCH Project
+    </footer>
+
+</body>
+</html>
