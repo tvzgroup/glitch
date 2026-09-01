@@ -8,11 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
             --glass-bg: rgba(255, 255, 255, 0.04);
             --glass-border: rgba(255, 255, 255, 0.1);
             --glass-hover: rgba(255, 255, 255, 0.12);
-            --glass-card-bg: rgba(30, 41, 59, 0.45);
+            --glass-card-bg: rgba(15, 23, 42, 0.55);
             --text-main: #f8fafc;
             --text-sub: #94a3b8;
             --accent-blue: #38bdf8;
@@ -29,12 +28,20 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
+        /* Animowany gradient w tle */
         body {
-            background: var(--bg-gradient);
-            background-attachment: fixed;
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #311042, #111827);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
             color: var(--text-main);
             min-height: 100vh;
             overflow-x: hidden;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .dashboard-container {
@@ -107,13 +114,13 @@
         }
 
         .nav-btn.active {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2));
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(192, 132, 252, 0.25));
             color: #fff;
             border: 1px solid rgba(56, 189, 248, 0.4);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* Glowny obszar roboczy */
+        /* Główny obszar roboczy */
         .main-content {
             flex: 1;
             padding: 35px 40px;
@@ -148,7 +155,8 @@
         }
 
         .glass-card:hover {
-            border-color: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .cards-grid {
@@ -203,7 +211,7 @@
         input[type="text"], textarea {
             width: 100%;
             padding: 14px 18px;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--glass-border);
             color: white;
             border-radius: 12px;
@@ -218,7 +226,7 @@
             box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
         }
 
-        /* Przyciski z Gradientem */
+        /* Przyciski z Animowanym Gradientem */
         .btn-gradient {
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
             border: none;
@@ -237,7 +245,7 @@
 
         .btn-gradient:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(192, 132, 252, 0.4);
+            box-shadow: 0 6px 25px rgba(192, 132, 252, 0.5);
         }
 
         .btn-gradient:disabled {
@@ -401,8 +409,8 @@
 
     <script>
         // STAŁE KONFIGURACYJNE
-        const CLIENT_ID = 'TUTAJ_INSERUJ_CLIENT_ID_BOTA';
-        const GUILD_ID = 'TUTAJ_INSERUJ_ID_SERWERA';
+        const CLIENT_ID = '1533579162391019581';
+        const GUILD_ID = '1533579361242976467'; // <-- Pamiętaj o wklejeniu ID swojego serwera Discord
         const API_BASE = 'http://de1.bot-hosting.cloud:25826/api';
         const REDIRECT_URI = 'https://tvzgroup.github.io/glitch/';
 
@@ -479,13 +487,12 @@
             }
         }
 
-        // 3. Odporne Pobieranie Statystyk z Bota (Fallback dla live & global stats)
+        // 3. Pobieranie Statystyk z Bota
         async function fetchStats() {
             try {
                 let res = await fetch(`${API_BASE}/stats/live/${GUILD_ID}`).catch(() => null);
                 
                 if (!res || !res.ok) {
-                    // Fallback do ogólnych statystyk
                     res = await fetch(`${API_BASE}/stats`);
                 }
 
