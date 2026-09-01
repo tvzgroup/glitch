@@ -3,318 +3,596 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Zarządzania Bota</title>
+    <title>Panel Bota - Glass Edition</title>
+    <!-- Ikony FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --sidebar-bg: #1e293b;
-            --card-bg: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-hover: rgba(255, 255, 255, 0.12);
+            --glass-card-bg: rgba(30, 41, 59, 0.45);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
             --accent-blue: #38bdf8;
+            --accent-purple: #c084fc;
             --accent-green: #4ade80;
             --accent-red: #f87171;
             --accent-yellow: #fbbf24;
-            --border-color: #334155;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-primary); overflow-x: hidden; }
-        .dashboard-container { display: flex; min-height: 100vh; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
 
-        /* Sidebar */
-        .sidebar { width: 260px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; padding: 20px; }
-        .sidebar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
-        .logo-icon { font-size: 28px; color: var(--accent-blue); }
-        .sidebar-menu { display: flex; flex-direction: column; gap: 10px; }
-        .sidebar-menu a { color: var(--text-secondary); text-decoration: none; padding: 12px 15px; border-radius: 8px; display: flex; align-items: center; gap: 12px; transition: 0.3s; }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background-color: var(--accent-blue); color: #fff; }
-        .status-indicator { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary); }
-        .dot { width: 10px; height: 10px; border-radius: 50%; }
-        .dot.online { background-color: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        /* Main Content */
-        .main-content { flex: 1; padding: 30px; }
-        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
-        .user-profile { display: flex; align-items: center; gap: 10px; background: var(--card-bg); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); }
-        .avatar { width: 35px; height: 35px; border-radius: 50%; }
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
 
-        /* Cards Grid */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background-color: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; }
-        .card-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 22px; }
-        .card-icon.blue { background-color: rgba(56, 189, 248, 0.2); color: var(--accent-blue); }
-        .card-icon.red { background-color: rgba(248, 113, 113, 0.2); color: var(--accent-red); }
-        .card-icon.yellow { background-color: rgba(251, 191, 36, 0.2); color: var(--accent-yellow); }
-        .card-info h3 { font-size: 14px; color: var(--text-secondary); }
-        .card-info p { font-size: 20px; font-weight: bold; }
+        /* Sidebar z filtrem efektu szkła */
+        .sidebar {
+            width: 270px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px 20px;
+            z-index: 10;
+        }
 
-        /* Form Control Box */
-        .panel-box { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 25px; }
-        .panel-box h2 { font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        input[type="text"], textarea, select { width: 100%; padding: 10px; background: var(--bg-dark); border: 1px solid var(--border-color); color: white; border-radius: 6px; margin: 6px 0 15px 0; outline: none; }
-        button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-blue { background: var(--accent-blue); color: #000; }
-        .btn-green { background: var(--accent-green); color: #000; }
-        button:hover { opacity: 0.9; }
-        button:disabled { background: #475569; cursor: not-allowed; color: #94a3b8; }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 40px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            color: var(--accent-blue);
+            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.6));
+        }
+
+        .sidebar-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-sub);
+            padding: 14px 18px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: left;
+            width: 100%;
+        }
+
+        .nav-btn:hover {
+            background: var(--glass-hover);
+            color: var(--text-main);
+            border-color: var(--glass-border);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2));
+            color: #fff;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Glowny obszar roboczy */
+        .main-content {
+            flex: 1;
+            padding: 35px 40px;
+            overflow-y: auto;
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .top-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* Szklane Karty (Glassmorphism Cards) */
+        .glass-card {
+            background: var(--glass-card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            margin-bottom: 25px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 22px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 26px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Przełączanie podstron */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Formularze i Pola tekstowe */
+        label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            outline: none;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+        }
+
+        /* Przyciski z Gradientem */
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(192, 132, 252, 0.4);
+        }
+
+        .btn-gradient:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Profil użytkownika i status */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 18px;
+            border-radius: 30px;
+            background: var(--glass-card-bg);
+            border: 1px solid var(--glass-border);
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-blue);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            background-color: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
+        }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fa-solid fa-robot logo-icon"></i>
-                <h2>BotAdmin</h2>
-            </div>
-            <nav class="sidebar-menu">
-                <a href="#" class="active"><i class="fa-solid fa-chart-line"></i> Statystyki Live</a>
-                <a href="#automod-section"><i class="fa-solid fa-shield-halved"></i> AutoMod</a>
-                <a href="#announcement-section"><i class="fa-solid fa-bullhorn"></i> Ogłoszenie</a>
-                <a href="#roles-section"><i class="fa-solid fa-user-shield"></i> Uprawnienia Ról</a>
-            </nav>
-            <div class="sidebar-footer">
-                <div class="status-indicator">
-                    <span class="dot online" id="status-dot"></span>
-                    <span id="bot-status-text">Łączenie z botem...</span>
+            <div>
+                <div class="sidebar-header">
+                    <i class="fa-solid fa-robot logo-icon"></i>
+                    <h2>BotPanel</h2>
                 </div>
+                <nav class="sidebar-menu">
+                    <button class="nav-btn active" onclick="switchTab('stats-tab', this, 'panel')">
+                        <i class="fa-solid fa-chart-line"></i> Statystyki
+                    </button>
+                    <button class="nav-btn" onclick="switchTab('automod-tab', this, 'automod')">
+                        <i class="fa-solid fa-shield-halved"></i> AutoModeracja
+                    </button>
+                    <button class="nav-btn" onclick="switchTab('announcement-tab', this, 'ogloszenia')">
+                        <i class="fa-solid fa-bullhorn"></i> Ogłoszenia
+                    </button>
+                    <button class="nav-btn" onclick="switchTab('ticket-tab', this, 'tickety')">
+                        <i class="fa-solid fa-ticket"></i> System Ticketów
+                    </button>
+                </nav>
+            </div>
+            <div style="font-size: 13px; color: var(--text-sub); display: flex; align-items: center; gap: 8px;">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text">Połączenie z botem...</span>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-header">
-                <h1>Przegląd Serwera</h1>
-                
-                <!-- Logowanie/Identyfikacja po Discord ID -->
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="user-id-input" placeholder="Wpisz swoje ID Discord..." style="margin: 0; width: 220px;">
-                    <button onclick="loginUser()" class="btn-blue">Zaloguj / Sprawdź</button>
-                    <div class="user-profile">
-                        <img src="https://cdn.discordapp.com/embed/avatars/0.png" id="user-avatar" class="avatar">
-                        <span id="user-tag-text">Niezalogowany</span>
+                <h1 id="page-title">Statystyki Na Żywo</h1>
+                <div id="auth-box">
+                    <button id="login-btn" onclick="loginWithDiscord()" class="btn-gradient">
+                        <i class="fa-brands fa-discord"></i> Zaloguj przez Discord
+                    </button>
+                    <div id="user-profile" class="user-profile" style="display: none;">
+                        <img id="user-avatar" class="avatar" src="https://cdn.discordapp.com/embed/avatars/0.png">
+                        <span id="user-name" style="font-weight: 600;">--</span>
                     </div>
                 </div>
             </header>
 
-            <!-- Statystyki na żywo -->
-            <div class="cards-grid">
-                <div class="card">
-                    <div class="card-icon blue"><i class="fa-solid fa-users"></i></div>
-                    <div class="card-info">
-                        <h3>Użytkownicy (Online)</h3>
-                        <p id="user-count">--</p>
+            <!-- PODSTRONA 1: STATYSTYKI -->
+            <div id="stats-tab" class="tab-content active">
+                <div class="cards-grid">
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon" style="color: var(--accent-blue);"><i class="fa-solid fa-users"></i></div>
+                        <div>
+                            <p style="color: var(--text-sub); font-size: 14px;">Użytkownicy (Online)</p>
+                            <h2 id="user-count">--</h2>
+                        </div>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon red"><div class="card-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div></div>
-                    <div class="card-info">
-                        <h3>Suma Aktywnych Warnów</h3>
-                        <p id="warn-count">--</p>
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon" style="color: var(--accent-red);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div>
+                            <p style="color: var(--text-sub); font-size: 14px;">Aktywne Warny</p>
+                            <h2 id="warn-count">--</h2>
+                        </div>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon yellow"><i class="fa-solid fa-bolt"></i></div>
-                    <div class="card-info">
-                        <h3>Ping Bota</h3>
-                        <p id="ping-val">-- ms</p>
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon" style="color: var(--accent-yellow);"><i class="fa-solid fa-bolt"></i></div>
+                        <div>
+                            <p style="color: var(--text-sub); font-size: 14px;">Ping Bota</p>
+                            <h2 id="ping-val">-- ms</h2>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- MODUŁ 1: Konfiguracja AutoModa -->
-            <div class="panel-box" id="automod-section">
-                <h2><i class="fa-solid fa-shield-halved" style="color: var(--accent-blue);"></i> Konfiguracja AutoModa</h2>
-                <label style="display: block; margin: 10px 0; cursor: pointer;">
-                    <input type="checkbox" id="toggle-antilink"> Blokada wysyłania linków (Anti-Link)
-                </label>
-                <label style="display: block; margin: 10px 0; cursor: pointer;">
-                    <input type="checkbox" id="toggle-anticaps"> Blokada CAPS LOCKA (Anti-Caps)
-                </label>
-                <button onclick="saveAutoMod()" id="btn-save-automod" class="btn-blue" disabled>Zapisz Ustawienia AutoModa</button>
-            </div>
-
-            <!-- MODUŁ 2: Wysyłanie Ogłoszeń z Panelu -->
-            <div class="panel-box" id="announcement-section">
-                <h2><i class="fa-solid fa-bullhorn" style="color: var(--accent-green);"></i> Wyślij Ogłoszenie na Kanał</h2>
-                <label>ID Kanału Discord:</label>
-                <input type="text" id="channel-id-input" placeholder="np. 123456789012345678">
-                <label>Tytuł Ogłoszenia:</label>
-                <input type="text" id="msg-title-input" placeholder="np. Ważny Komunikat">
-                <label>Treść Wiadomości:</label>
-                <textarea id="msg-content-input" placeholder="Wpisz treść ogłoszenia..."></textarea>
-                <button onclick="sendAnnouncement()" id="btn-send-msg" class="btn-green" disabled>Wyślij na Discorda</button>
-            </div>
-
-            <!-- MODUŁ 3: Uprawnienia Ról (Widoczny dla Właściciela) -->
-            <div class="panel-box" id="roles-section" style="display: none;">
-                <h2><i class="fa-solid fa-user-shield" style="color: var(--accent-yellow);"></i> Permisje Ról (Dla Właściciela)</h2>
-                <label>Wybierz rolę z serwera:</label>
-                <select id="role-select" onchange="loadRolePermissions()"></select>
-
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin: 8px 0;"><input type="checkbox" id="perm-automod"> Dostęp do edycji AutoModa</label>
-                    <label style="display: block; margin: 8px 0;"><input type="checkbox" id="perm-announcements"> Dostęp do wysyłania ogłoszeń</label>
+            <!-- PODSTRONA 2: AUTOMODERACJA -->
+            <div id="automod-tab" class="tab-content">
+                <div class="glass-card">
+                    <h2 style="margin-bottom: 20px; font-size: 20px;"><i class="fa-solid fa-shield-halved" style="color: var(--accent-blue);"></i> Konfiguracja AutoModa</h2>
+                    <label style="display: flex; gap: 12px; align-items: center; margin-bottom: 18px; cursor: pointer; color: var(--text-main); font-size: 16px;">
+                        <input type="checkbox" id="toggle-antilink" style="width: 18px; height: 18px; accent-color: var(--accent-blue);"> Blokada Linków (Anti-Link)
+                    </label>
+                    <label style="display: flex; gap: 12px; align-items: center; margin-bottom: 25px; cursor: pointer; color: var(--text-main); font-size: 16px;">
+                        <input type="checkbox" id="toggle-anticaps" style="width: 18px; height: 18px; accent-color: var(--accent-blue);"> Blokada CAPS LOCKA (Anti-Caps)
+                    </label>
+                    <button onclick="saveAutoMod()" id="btn-automod" class="btn-gradient">
+                        <i class="fa-solid fa-floppy-disk"></i> Zapisz Ustawienia
+                    </button>
                 </div>
-                <button onclick="saveRolePermissions()" class="btn-blue">Zapisz Permisje Roli</button>
+            </div>
+
+            <!-- PODSTRONA 3: OGŁOSZENIA -->
+            <div id="announcement-tab" class="tab-content">
+                <div class="glass-card">
+                    <h2 style="margin-bottom: 20px; font-size: 20px;"><i class="fa-solid fa-bullhorn" style="color: var(--accent-purple);"></i> Wyślij Ogłoszenie na Kanał Discord</h2>
+                    
+                    <label for="channel-id">ID Kanału Tekstowego:</label>
+                    <input type="text" id="channel-id" placeholder="np. 123456789012345678">
+
+                    <label for="msg-title">Tytuł Wiadomości:</label>
+                    <input type="text" id="msg-title" placeholder="np. Ważny Komunikat">
+
+                    <label for="msg-content">Treść Ogłoszenia:</label>
+                    <textarea id="msg-content" rows="5" placeholder="Wpisz treść ogłoszenia..."></textarea>
+
+                    <button onclick="sendAnnouncement()" id="btn-announcement" class="btn-gradient">
+                        <i class="fa-solid fa-paper-plane"></i> Wyślij Ogłoszenie
+                    </button>
+                </div>
+            </div>
+
+            <!-- PODSTRONA 4: TICKETY -->
+            <div id="ticket-tab" class="tab-content">
+                <div class="glass-card">
+                    <h2 style="margin-bottom: 20px; font-size: 20px;"><i class="fa-solid fa-ticket" style="color: var(--accent-green);"></i> Wysyłanie Paneli Ticketów</h2>
+                    
+                    <label for="ticket-channel-id">ID Kanału do wysłania Panelu Ticketów:</label>
+                    <input type="text" id="ticket-channel-id" placeholder="np. 123456789012345678">
+
+                    <button onclick="sendTicketPanel()" id="btn-ticket" class="btn-gradient">
+                        <i class="fa-solid fa-paper-plane"></i> Wyślij Panel Ticketów
+                    </button>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
-        // PODMIENIĆ NA ID TWOJEGO SERWERA DISCORD:
-        const GUILD_ID = 'WPISZ_TUTAJ_ID_SWOJEGO_SERWERA';
+        // STAŁE KONFIGURACYJNE
+        const CLIENT_ID = 'TUTAJ_INSERUJ_CLIENT_ID_BOTA';
+        const GUILD_ID = 'TUTAJ_INSERUJ_ID_SERWERA';
         const API_BASE = 'http://de1.bot-hosting.cloud:25826/api';
+        const REDIRECT_URI = 'https://tvzgroup.github.io/glitch/';
 
-        let currentUserPermissions = {};
-        let cachedRolePerms = {};
+        let currentUser = null;
 
-        // 1. Aktualizacja Statystyk na żywo
-        async function fetchLiveStats() {
-            try {
-                const response = await fetch(`${API_BASE}/stats/live/${GUILD_ID}`);
-                if (!response.ok) throw new Error('Serwer niedostępny');
-                
-                const data = await response.json();
+        // 1. Przełączanie Podstron / Zakładek
+        function switchTab(tabId, btn, pathName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+            if (btn) {
+                btn.classList.add('active');
+            }
 
-                document.getElementById('user-count').innerText = `${data.members.total} (${data.members.online} online)`;
-                document.getElementById('warn-count').innerText = data.warns;
-                document.getElementById('ping-val').innerText = `${data.ping} ms`;
+            // Ładny URL bez przeładowania
+            if (pathName) {
+                history.pushState(null, '', `/glitch/${pathName}`);
+            }
 
-                document.getElementById('bot-status-text').innerText = 'Bot Status: ONLINE';
-                document.getElementById('status-dot').className = 'dot online';
-            } catch (error) {
-                document.getElementById('ping-val').innerText = 'OFFLINE';
-                document.getElementById('bot-status-text').innerText = 'Bot Status: OFFLINE';
-                document.getElementById('status-dot').className = 'dot';
+            // Nagłówek strony
+            const titles = {
+                'panel': 'Statystyki Na Żywo',
+                'automod': 'Zarządzanie AutoModeracją',
+                'ogloszenia': 'Wysyłanie Ogłoszeń',
+                'tickety': 'System Ticketów'
+            };
+            document.getElementById('page-title').innerText = titles[pathName] || 'Panel Bota';
+        }
+
+        // 2. Logowanie Discord OAuth2
+        function loginWithDiscord() {
+            window.location.href = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=identify`;
+        }
+
+        async function handleOAuthCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+
+            if (code) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                try {
+                    const res = await fetch(`${API_BASE}/auth/callback`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code })
+                    });
+                    const data = await res.json();
+                    if (data.user) {
+                        currentUser = data.user;
+                        localStorage.setItem('discord_user', JSON.stringify(currentUser));
+                        updateUserUI();
+                    }
+                } catch (e) { console.error('Błąd logowania:', e); }
+            } else {
+                const saved = localStorage.getItem('discord_user');
+                if (saved) {
+                    currentUser = JSON.parse(saved);
+                    updateUserUI();
+                }
             }
         }
 
-        // 2. Logowanie i weryfikacja uprawnień użytkownika po ID
-        async function loginUser() {
-            const userId = document.getElementById('user-id-input').value.trim();
-            if (!userId) return alert('Wpisz prawidłowe ID użytkownika!');
+        function updateUserUI() {
+            if (!currentUser) return;
+            document.getElementById('login-btn').style.display = 'none';
+            document.getElementById('user-profile').style.display = 'flex';
+            document.getElementById('user-name').innerText = currentUser.username;
+            if (currentUser.avatar) {
+                document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png`;
+            }
+        }
 
+        // 3. Odporne Pobieranie Statystyk z Bota (Fallback dla live & global stats)
+        async function fetchStats() {
             try {
-                const res = await fetch(`${API_BASE}/user-access/${GUILD_ID}/${userId}`);
-                const data = await res.json();
-
-                if (data.error) return alert('Błąd: ' + data.error);
-
-                document.getElementById('user-tag-text').innerText = data.user.tag;
-                if (data.user.avatar) document.getElementById('user-avatar').src = data.user.avatar;
-
-                currentUserPermissions = data.permissions;
-
-                // Włączanie / wyłączanie przycisków w zależności od uprawnień
-                document.getElementById('btn-save-automod').disabled = !currentUserPermissions.canManageAutoMod;
-                document.getElementById('btn-send-msg').disabled = !currentUserPermissions.canSendAnnouncements;
-
-                // Pokazywanie panelu ról tylko dla właściciela
-                if (currentUserPermissions.isOwner) {
-                    document.getElementById('roles-section').style.display = 'block';
-                    loadGuildRoles();
-                } else {
-                    document.getElementById('roles-section').style.display = 'none';
+                let res = await fetch(`${API_BASE}/stats/live/${GUILD_ID}`).catch(() => null);
+                
+                if (!res || !res.ok) {
+                    // Fallback do ogólnych statystyk
+                    res = await fetch(`${API_BASE}/stats`);
                 }
 
-                alert(`Zalogowano jako ${data.user.tag}! Sprawdzono Twoje uprawnienia.`);
-            } catch (e) {
-                alert('Błąd podczas weryfikacji użytkownika w botcie.');
-            }
-        }
+                if (!res.ok) throw new Error("API nie odpowiada");
 
-        // 3. Pobieranie ról serwera dla Właściciela
-        async function loadGuildRoles() {
-            try {
-                const res = await fetch(`${API_BASE}/roles/${GUILD_ID}`);
                 const data = await res.json();
-                cachedRolePerms = data.permissions || {};
 
-                const select = document.getElementById('role-select');
-                select.innerHTML = '';
-                data.roles.forEach(role => {
-                    const opt = document.createElement('option');
-                    opt.value = role.id;
-                    opt.innerText = role.name;
-                    select.appendChild(opt);
-                });
+                if (data.members) {
+                    document.getElementById('user-count').innerText = `${data.members.total} (${data.members.online || 0} online)`;
+                } else if (data.users !== undefined) {
+                    document.getElementById('user-count').innerText = `${data.users}`;
+                }
 
-                loadRolePermissions();
+                document.getElementById('warn-count').innerText = data.warns !== undefined ? data.warns : 0;
+                document.getElementById('ping-val').innerText = `${data.ping || 0} ms`;
+
+                document.getElementById('status-text').innerText = 'ONLINE';
+                document.getElementById('status-text').style.color = 'var(--accent-green)';
+                document.getElementById('status-dot').style.backgroundColor = 'var(--accent-green)';
             } catch (e) {
-                console.error('Błąd pobierania ról:', e);
+                document.getElementById('ping-val').innerText = 'OFFLINE';
+                document.getElementById('status-text').innerText = 'OFFLINE';
+                document.getElementById('status-text').style.color = 'var(--accent-red)';
+                document.getElementById('status-dot').style.backgroundColor = 'var(--accent-red)';
             }
         }
 
-        function loadRolePermissions() {
-            const roleId = document.getElementById('role-select').value;
-            const perms = cachedRolePerms[roleId] || {};
-
-            document.getElementById('perm-automod').checked = !!perms.canManageAutoMod;
-            document.getElementById('perm-announcements').checked = !!perms.canSendAnnouncements;
-        }
-
-        // Zapisywanie permisji dla ról
-        async function saveRolePermissions() {
-            const roleId = document.getElementById('role-select').value;
-            const permissions = {
-                canManageAutoMod: document.getElementById('perm-automod').checked,
-                canSendAnnouncements: document.getElementById('perm-announcements').checked
-            };
-
-            const res = await fetch(`${API_BASE}/roles/permissions`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ guildId: GUILD_ID, roleId, permissions })
-            });
-
-            const data = await res.json();
-            alert(data.message);
-        }
-
-        // 4. Wysyłanie polecenia zmiany AutoModa do bota
+        // 4. Zapisywanie AutoModa
         async function saveAutoMod() {
             const antiLink = document.getElementById('toggle-antilink').checked;
             const antiCaps = document.getElementById('toggle-anticaps').checked;
-
-            const res = await fetch(`${API_BASE}/automod`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ guildId: GUILD_ID, antiLink, antiCaps })
-            });
-
-            const data = await res.json();
-            alert(data.message || 'Zapisano ustawienia AutoModa!');
-        }
-
-        // 5. Wysyłanie wiadomości z panelu na kanał Discord
-        async function sendAnnouncement() {
-            const channelId = document.getElementById('channel-id-input').value.trim();
-            const title = document.getElementById('msg-title-input').value.trim();
-            const message = document.getElementById('msg-content-input').value.trim();
-
-            if (!channelId || !message) return alert('Podaj ID kanału oraz treść!');
-
-            const res = await fetch(`${API_BASE}/announcement`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ channelId, title, message })
-            });
-
-            const data = await res.json();
-            if (data.success) {
-                alert('Wiadomość została wysłana na Discorda!');
-            } else {
-                alert('Błąd: ' + data.error);
+            try {
+                const res = await fetch(`${API_BASE}/automod`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ guildId: GUILD_ID, antiLink, antiCaps })
+                });
+                const data = await res.json();
+                alert(data.message || 'Zapisano zmiany AutoModa!');
+            } catch (e) {
+                alert('Błąd połączenia z botem.');
             }
         }
 
-        // Pobieraj statystyki na żywo co 3 sekundy
-        fetchLiveStats();
-        setInterval(fetchLiveStats, 3000);
+        // 5. Wysyłanie Ogłoszenia na Discorda
+        async function sendAnnouncement() {
+            const channelId = document.getElementById('channel-id').value.trim();
+            const title = document.getElementById('msg-title').value.trim();
+            const message = document.getElementById('msg-content').value.trim();
+
+            if (!channelId || !message) {
+                return alert('Uzupełnij ID kanału oraz treść wiadomości!');
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/announcement`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channelId, title, message })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ Wiadomość została pomyślnie wysłana na serwer Discord!');
+                    document.getElementById('msg-content').value = '';
+                } else {
+                    alert('❌ Błąd: ' + data.error);
+                }
+            } catch (e) {
+                alert('Błąd podczas przesyłania wiadomości do bota.');
+            }
+        }
+
+        // 6. Wysyłanie Paneli Ticketów
+        async function sendTicketPanel() {
+            const channelId = document.getElementById('ticket-channel-id').value.trim();
+
+            if (!channelId) {
+                return alert('Uzupełnij ID kanału!');
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/announcement`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        channelId, 
+                        title: '📩 Centrum Pomocy & Zgłoszeń', 
+                        message: 'Kliknij na Discordzie przycisk poniżej panelu, aby utworzyć nowe zgłoszenie.' 
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ Panel Ticketów wysłany na kanał!');
+                } else {
+                    alert('❌ Błąd: ' + data.error);
+                }
+            } catch (e) {
+                alert('Błąd podczas przesyłania wiadomości do bota.');
+            }
+        }
+
+        // Inicjalizacja przy starcie
+        window.onload = () => {
+            handleOAuthCallback();
+            fetchStats();
+            setInterval(fetchStats, 3000);
+        };
     </script>
 </body>
 </html>
